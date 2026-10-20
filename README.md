@@ -9,7 +9,7 @@ Primeira versão de um CRM interno para o time comercial da **Nobre Brindes**. E
 | ![Detalhe](docs/detalhe.png) | ![Retornos](docs/retornos.png) |
 
 **Sumário**
-[Como rodar](#como-rodar) · [Arquitetura](#arquitetura) · [Regras do funil](#regras-do-funil) · [Consistência](#consistência-dos-dados) · [O que exige atenção](#o-que-exige-atenção) · [Automação](#automação-escolhida-problema-4--retornos-de-follow-up) · [Outros problemas](#os-outros-três-problemas) · [Segurança](#segurança) · [Testes](#testes) · [Dados do case](#dados-do-case-e-lacunas) · [Limitações](#limitações-e-próximos-passos) · [Uso de IA](#uso-de-ia)
+[Como rodar](#como-rodar) · [Arquitetura](#arquitetura) · [Regras do funil](#regras-do-funil) · [Consistência](#consistência-dos-dados) · [O que exige atenção](#o-que-exige-atenção) · [Automação](#automação-escolhida-problema-4-retornos-de-follow-up) · [Outros problemas](#os-outros-três-problemas) · [Segurança](#segurança) · [Testes](#testes) · [Dados do case](#dados-do-case-e-lacunas) · [Limitações](#limitações-e-próximos-passos) · [Uso de IA](#uso-de-ia)
 
 ---
 
@@ -269,7 +269,7 @@ São 93 testes. Os de integração rodam contra um banco separado (`nobre_crm_te
 | --- | --- |
 | OPP-2001 sem validade de proposta | Coerente: está em Primeiro Contato e ainda não há proposta. A regra "Follow-up exige validade" impede que ela avance para Follow-up sem esse dado. |
 | OPP-2007 Perdida, sem motivo na planilha | O motivo é obrigatório (e o banco garante). Na carga, ficou registrado explicitamente **"Motivo não registrado na planilha de origem"**, em vez de inventar um motivo ou afrouxar a regra. |
-| Data de entrada do lead não existe | Uso o último contato como aproximação, documentado no código da carga. |
+| Data de entrada do lead não existe | Uso o último contato como aproximação, documentado no código da carga. Consequência: o alerta "lead sem primeiro contato" **não dispara nos dados do case**, porque as 7 oportunidades já têm um contato. A regra existe para leads novos que entram pela API ou pelo botão "Nova oportunidade": eles entram sem contato, o retorno vence no dia da entrada e viram crítico no dia seguinte (coberto em `attention.test.ts`). |
 | Sem histórico de etapas anterior | Cada oportunidade recebe um registro "Carga inicial" com autor `carga-inicial`. |
 | Etapas da planilha podem não cumprir as regras novas | A carga importa a situação como está (é um retrato do passado). As regras valem para toda mudança feita daqui em diante. |
 
