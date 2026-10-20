@@ -1,6 +1,4 @@
--- Estrutura inicial do CRM da Nobre Brindes.
--- As regras de etapa vivem no domínio da API; as constraints abaixo são a última linha de defesa
--- (nenhum script, migração ou acesso direto ao banco deixa um dado impossível entrar).
+-- As regras ficam na API. As constraints aqui são uma segunda barreira.
 
 CREATE TYPE opportunity_stage AS ENUM (
   'PRIMEIRO_CONTATO',
@@ -55,7 +53,7 @@ CREATE TABLE opportunity_items (
 
 CREATE INDEX opportunity_items_opportunity_idx ON opportunity_items (opportunity_id);
 
--- Histórico de etapas: quando, de onde, para onde, por quê e por quem. Só recebe INSERT.
+-- histórico de etapas (só insert)
 CREATE TABLE stage_history (
   id             BIGSERIAL PRIMARY KEY,
   opportunity_id INT NOT NULL REFERENCES opportunities (id) ON DELETE CASCADE,
@@ -82,7 +80,7 @@ CREATE TABLE contacts (
 
 CREATE INDEX contacts_opportunity_idx ON contacts (opportunity_id, contacted_on);
 
--- Automação de follow-up: cada oportunidade aberta tem exatamente um "próximo retorno" em aberto.
+-- uma tarefa aberta por oportunidade = o próximo retorno
 CREATE TABLE follow_up_tasks (
   id                    BIGSERIAL PRIMARY KEY,
   opportunity_id        INT NOT NULL REFERENCES opportunities (id) ON DELETE CASCADE,
@@ -100,7 +98,7 @@ CREATE UNIQUE INDEX follow_up_tasks_one_open_per_opportunity
   ON follow_up_tasks (opportunity_id) WHERE status = 'OPEN';
 CREATE INDEX follow_up_tasks_open_due_idx ON follow_up_tasks (due_date) WHERE status = 'OPEN';
 
--- Resumo diário enviado a cada vendedor (garante no máximo um envio por dia, mesmo com o job rodando várias vezes).
+-- resumo diário: no máximo um por vendedor por dia
 CREATE TABLE follow_up_digests (
   id          BIGSERIAL PRIMARY KEY,
   seller_id   INT NOT NULL REFERENCES sellers (id),

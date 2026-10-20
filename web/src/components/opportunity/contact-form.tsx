@@ -14,7 +14,6 @@ export const CHANNEL_LABELS: Record<ContactChannel, string> = {
   MEETING: 'Reunião',
 };
 
-/** Registrar o contato é o que conclui o retorno pendente; a automação agenda o próximo. */
 export function ContactForm({
   opportunityId,
   today,

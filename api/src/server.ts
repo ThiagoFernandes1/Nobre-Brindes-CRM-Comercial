@@ -20,8 +20,7 @@ if (config.REFERENCE_DATE) {
   app.log.warn(`REFERENCE_DATE ativa: as regras consideram hoje = ${config.REFERENCE_DATE}`);
 }
 
-// Job de follow-up dentro do processo: simples para rodar localmente. Em produção, prefira um agendador
-// externo chamando `npm run job:follow-ups` (ver README).
+// em produção o melhor é um agendador externo chamando `npm run job:follow-ups`
 let jobRunning = false;
 async function tick() {
   if (jobRunning) return;

@@ -91,7 +91,7 @@ export async function findOpportunities(db: Queryable, filters: OpportunityFilte
   return rows.map(toOpportunity);
 }
 
-/** `forUpdate` trava a linha até o fim da transação: duas mudanças simultâneas na mesma oportunidade viram fila. */
+// forUpdate trava a linha até o fim da transação
 export async function findOpportunityById(
   db: Queryable,
   id: number,

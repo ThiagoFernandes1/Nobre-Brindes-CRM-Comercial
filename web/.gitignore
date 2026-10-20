@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# gerado pelo next dev
+AGENTS.md
+CLAUDE.md

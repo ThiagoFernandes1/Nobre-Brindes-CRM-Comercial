@@ -11,7 +11,6 @@ interface ModalProps {
   variant?: 'center' | 'side';
 }
 
-/** Usa <dialog> nativo: foco preso no modal, Esc para fechar e leitura correta por leitores de tela. */
 export function Modal({ open, onClose, title, children, variant = 'center' }: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
 

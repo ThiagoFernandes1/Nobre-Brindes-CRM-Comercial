@@ -18,7 +18,7 @@ const BUCKETS: { id: AgendaEntry['bucket']; title: string; empty: string; tone: 
 
 export function Agenda() {
   const { sellerId: currentSellerId } = useCurrentSeller();
-  // null = ainda não escolhido nesta tela: segue o "Você é" do cabeçalho
+  // null = segue o vendedor escolhido no cabeçalho
   const [chosenSellerId, setChosenSellerId] = useState<number | 'ALL' | null>(null);
   const sellerId = chosenSellerId === 'ALL' ? null : (chosenSellerId ?? currentSellerId);
   const sellers = useSellers();
@@ -32,9 +32,8 @@ export function Agenda() {
         <div>
           <h1 className="text-xl font-semibold">Retornos</h1>
           <p className="max-w-xl text-sm text-stone-600">
-            Lista montada automaticamente: cada negociação aberta tem um próximo retorno, calculado pela etapa, pela data
-            combinada com o cliente, pelo vencimento da proposta e pelo prazo de produção do evento. Registrar o contato
-            conclui o retorno e agenda o seguinte.
+            Cada negociação aberta tem um próximo retorno. Ao registrar o contato, o retorno é concluído e o próximo já
+            é agendado.
           </p>
         </div>
         <label className="sm:w-52">

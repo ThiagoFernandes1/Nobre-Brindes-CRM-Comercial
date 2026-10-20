@@ -13,7 +13,7 @@ function makeQueryClient() {
     defaultOptions: {
       queries: {
         staleTime: 15_000,
-        // Erro de regra (4xx) não melhora tentando de novo; só falha de rede/servidor.
+        // não adianta repetir erro 4xx
         retry: (failureCount, error) =>
           failureCount < 2 && !(error instanceof ApiError && error.status >= 400 && error.status < 500),
       },
@@ -50,7 +50,7 @@ function readStoredSeller(): number | null {
     const stored = Number(window.localStorage.getItem(STORAGE_KEY));
     return stored > 0 ? stored : null;
   } catch {
-    return null; // armazenamento indisponível (ex.: modo privado): segue sem lembrar
+    return null; // modo privado etc.
   }
 }
 
@@ -59,14 +59,13 @@ function storeSeller(id: number | null) {
     if (id) window.localStorage.setItem(STORAGE_KEY, String(id));
     else window.localStorage.removeItem(STORAGE_KEY);
   } catch {
-    // idem: a escolha só não fica lembrada
+    // ignora
   }
   storageListeners.forEach((listener) => listener());
 }
 
-/** "Quem é você": lembrado no navegador, usado na agenda e como autor das mudanças no histórico. */
 function CurrentSellerProvider({ children }: { children: ReactNode }) {
-  // No servidor não há localStorage: começa sem vendedor e o navegador assume após hidratar.
+  // no servidor não tem localStorage
   const sellerId = useSyncExternalStore(subscribeToStoredSeller, readStoredSeller, () => null);
   const { data: sellers } = useSellers();
 

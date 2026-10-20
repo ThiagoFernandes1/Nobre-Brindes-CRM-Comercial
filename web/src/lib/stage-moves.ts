@@ -2,11 +2,7 @@ import type { Meta, Stage } from './types';
 
 export type MoveKind = 'ADVANCE' | 'RETURN' | 'LOSS' | 'INVALID';
 
-/**
- * Classifica um movimento usando o mapa de etapas que a própria API publica em /meta.
- * Serve só para orientar a tela (destacar colunas, pedir motivo). Quem decide é a API, que também
- * confere os requisitos de dados (valor, item, validade) e devolve a mensagem quando falta algo.
- */
+// Só para a tela (destacar colunas, pedir motivo). Quem valida de verdade é a API.
 export function classifyMove(meta: Meta, from: Stage, to: Stage): MoveKind {
   if (from === to) return 'INVALID';
   const fromMeta = meta.stages.find((s) => s.id === from);

@@ -1,9 +1,6 @@
 import type { NextRequest } from 'next/server';
 
-/**
- * Backend-for-frontend: o navegador só conhece /api/* do próprio Next. Aqui, no servidor, a requisição é
- * repassada para a API do CRM com a chave (API_KEY), que assim nunca chega ao JavaScript do cliente.
- */
+// Repassa /api/* para a API e põe a chave aqui no servidor, assim ela não vai para o navegador.
 const API_URL = (process.env.API_URL ?? 'http://localhost:3333').replace(/\/$/, '');
 const FORWARDED_HEADERS = ['content-type', 'x-user-name'];
 

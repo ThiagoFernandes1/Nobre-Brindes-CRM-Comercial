@@ -1,4 +1,4 @@
-/** Data de calendário no formato YYYY-MM-DD. Datas de negócio (contato, validade, evento) não têm hora. */
+// YYYY-MM-DD
 export type IsoDate = string;
 
 const DAY_MS = 86_400_000;
@@ -11,7 +11,6 @@ export function addDays(date: IsoDate, days: number): IsoDate {
   return new Date(toUtcMs(date) + days * DAY_MS).toISOString().slice(0, 10);
 }
 
-/** Dias corridos de `from` até `to` (negativo se `to` for anterior). */
 export function daysBetween(from: IsoDate, to: IsoDate): number {
   return Math.round((toUtcMs(to) - toUtcMs(from)) / DAY_MS);
 }

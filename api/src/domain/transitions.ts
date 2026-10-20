@@ -8,7 +8,6 @@ import {
   type Stage,
 } from './stages.js';
 
-/** Dados mínimos de uma oportunidade que as regras de etapa precisam enxergar. */
 export interface StageSubject {
   stage: Stage;
   estimatedValue: number | null;
@@ -49,11 +48,7 @@ function fail(code: TransitionErrorCode, message: string, missing?: MissingRequi
   return missing ? { ok: false, code, message, missing } : { ok: false, code, message };
 }
 
-/**
- * Requisitos que uma oportunidade precisa cumprir para *estar* em uma etapa aberta.
- * São cumulativos: quem está em Forecast também precisa de valor, item e validade.
- * Usado tanto na mudança de etapa quanto na edição (não dá para apagar o valor de quem está em Follow-up).
- */
+// Requisitos cumulativos para estar numa etapa. Vale na mudança de etapa e na edição.
 export function stageInvariantViolations(subject: Omit<StageSubject, 'stage'>, stage: Stage): MissingRequirement[] {
   const index = pipelineIndex(stage);
   const missing: MissingRequirement[] = [];
@@ -66,7 +61,7 @@ export function stageInvariantViolations(subject: Omit<StageSubject, 'stage'>, s
       missing.push({ code: 'GIFT_ITEM', message: 'Informe pelo menos um item de brinde.' });
     }
   }
-  // Follow-up significa "proposta enviada aguardando resposta": sem validade não há o que cobrar.
+  // Follow-up = proposta enviada, então precisa de validade
   if (index >= pipelineIndex('FOLLOW_UP')) {
     if (!subject.proposalValidUntil) {
       missing.push({ code: 'PROPOSAL_VALIDITY', message: 'Informe a validade da proposta enviada.' });

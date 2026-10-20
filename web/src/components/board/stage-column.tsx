@@ -17,7 +17,7 @@ interface StageColumnProps {
   opportunities: Opportunity[];
   today: string;
   onOpen: (id: number) => void;
-  /** Durante um arraste: que tipo de movimento seria soltar aqui (null = nada sendo arrastado). */
+  /** null quando nada está sendo arrastado */
   dropKind: MoveKind | null;
 }
 

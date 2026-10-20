@@ -1,4 +1,4 @@
-// Execução avulsa do job de follow-up, para agendador externo (cron, Cloud Scheduler, GitHub Actions...).
+// roda o job uma vez (para cron ou agendador externo)
 import { config } from '../config.js';
 import { createPool } from '../db/pool.js';
 import { today } from '../lib/clock.js';

@@ -43,7 +43,7 @@ export function OpportunityDrawer({ opportunityId, onClose }: { opportunityId: n
           onRetry={() => void detail.refetch()}
         />
       ) : (
-        // key: ao trocar de oportunidade, formulários abertos começam do zero
+        // key: trocar de oportunidade reseta os formulários
         <DrawerBody key={detail.data.id} opportunity={detail.data} meta={meta.data} />
       )}
     </Modal>
@@ -66,7 +66,6 @@ function DrawerBody({ opportunity, meta }: { opportunity: OpportunityDetail; met
         <span className="font-semibold">{formatCurrency(opportunity.estimatedValue)}</span>
       </div>
 
-      {/* 1. O que está errado */}
       {!isClosed && (
         <section aria-label="Alertas">
           {opportunity.attention.flags.length === 0 ? (
@@ -89,7 +88,6 @@ function DrawerBody({ opportunity, meta }: { opportunity: OpportunityDetail; met
         </p>
       )}
 
-      {/* 2. O que fazer agora */}
       {next && (
         <section className="rounded-xl border border-stone-200 p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -127,7 +125,6 @@ function DrawerBody({ opportunity, meta }: { opportunity: OpportunityDetail; met
         </section>
       )}
 
-      {/* 3. Dados */}
       <section>
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-stone-800">Dados da negociação</h3>
@@ -196,7 +193,6 @@ function DrawerBody({ opportunity, meta }: { opportunity: OpportunityDetail; met
         )}
       </section>
 
-      {/* 4. O que já aconteceu */}
       <section>
         <h3 className="text-sm font-semibold text-stone-800">Contatos</h3>
         {opportunity.contacts.length === 0 ? (

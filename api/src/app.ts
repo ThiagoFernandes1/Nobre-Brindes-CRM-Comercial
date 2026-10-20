@@ -16,7 +16,7 @@ export interface AppDeps {
   logger?: boolean;
 }
 
-// Violações de constraint do Postgres: o dado chegou ao banco furando a validação da API.
+// not null, foreign key e check do Postgres
 const PG_CONSTRAINT_ERRORS = new Set(['23502', '23503', '23514']);
 
 function safeEqual(a: string, b: string): boolean {
@@ -60,7 +60,6 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
       return reply.status(err.statusCode).send({ error: { code: 'BAD_REQUEST', message: err.message } });
     }
     request.log.error({ err: error }, 'erro inesperado');
-    // Nunca devolver detalhes internos (SQL, stack) para o cliente.
     return reply.status(500).send({ error: { code: 'INTERNAL_ERROR', message: 'Erro inesperado. Tente novamente.' } });
   });
 

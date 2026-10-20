@@ -22,26 +22,19 @@ export interface AttentionFlag {
 export interface Attention {
   level: Severity | 'OK';
   flags: AttentionFlag[];
-  /** Para ordenar: maior = mais urgente. */
+  /** maior = mais urgente */
   score: number;
   nextFollowUp: (PlannedFollowUp & { daysLate: number }) | null;
 }
 
-/** Proposta vencendo em até N dias já merece um alerta. */
 export const PROPOSAL_EXPIRING_WARNING_DAYS = 3;
-/** Evento em até N dias (mas fora do prazo crítico de produção) merece um alerta. */
 export const EVENT_WARNING_DAYS = 14;
-/** Retorno atrasado há N dias ou mais deixa de ser alerta e vira crítico. */
 export const FOLLOW_UP_CRITICAL_DELAY_DAYS = 3;
 
 const SEVERITY_WEIGHT: Record<Severity, number> = { CRITICAL: 100, WARNING: 10 };
 const STAGES_WITH_SENT_PROPOSAL: readonly Stage[] = ['FOLLOW_UP', 'FORECAST'];
 const STAGES_WITH_PROPOSAL: readonly Stage[] = ['APRESENTACAO_ORCAMENTO', ...STAGES_WITH_SENT_PROPOSAL];
 
-/**
- * Responde "esta negociação precisa de atenção hoje, e por quê?".
- * Estados finais nunca pedem atenção.
- */
 export function assessAttention(subject: FollowUpSubject, today: IsoDate): Attention {
   if (isFinal(subject.stage)) {
     return { level: 'OK', flags: [], score: 0, nextFollowUp: null };

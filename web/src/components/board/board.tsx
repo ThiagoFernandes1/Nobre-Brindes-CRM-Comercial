@@ -29,7 +29,6 @@ export function Board() {
   const meta = useMeta();
   const sellers = useSellers();
   const [filters, setFilters] = useState<OpportunityFilters>(EMPTY_FILTERS);
-  // A busca é enviada à API com um pequeno atraso para não disparar uma requisição por tecla.
   const search = useDebouncedValue(filters.search.trim(), 300);
   const query = useOpportunities({ ...filters, search });
 

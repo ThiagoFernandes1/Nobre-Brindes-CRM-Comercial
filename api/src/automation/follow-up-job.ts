@@ -12,11 +12,7 @@ export interface FollowUpJobResult {
   digestErrors: string[];
 }
 
-/**
- * Envia o resumo do dia para cada vendedor com pendências, no máximo uma vez por vendedor por dia.
- * O registro em follow_up_digests e o envio ficam na mesma transação: se o envio falhar,
- * o registro é desfeito e a próxima execução tenta de novo.
- */
+// Registro e envio na mesma transação: se o envio falhar, nada fica marcado e o próximo ciclo tenta de novo.
 export async function sendDailyDigests(db: Db, notifier: Notifier, today: IsoDate) {
   const digests = buildSellerDigests(await getAgenda(db, today), today);
   const sent: string[] = [];

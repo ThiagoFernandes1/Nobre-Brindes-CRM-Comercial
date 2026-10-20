@@ -1,2 +1,2 @@
--- Banco isolado para os testes de integração (o volume de dev nunca é tocado pelos testes).
+-- banco usado só pelos testes de integração
 CREATE DATABASE nobre_crm_test;

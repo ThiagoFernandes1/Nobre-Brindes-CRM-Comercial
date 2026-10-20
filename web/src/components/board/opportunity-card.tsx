@@ -15,7 +15,6 @@ interface CardProps {
   opportunity: Opportunity;
   today: string;
   onOpen: (id: number) => void;
-  /** Cópia exibida enquanto o card é arrastado. */
   overlay?: boolean;
 }
 
@@ -36,7 +35,7 @@ export function OpportunityCard({ opportunity, today, onOpen, overlay = false }:
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      // O card inteiro é arrastável com mouse/toque; teclado abre o detalhe, onde há o "Mover para".
+      // pelo teclado abre o detalhe, que tem os botões de mover
       role="button"
       tabIndex={0}
       aria-label={`${opportunity.code} ${opportunity.companyName}. ${mainFlag ? mainFlag.message : 'Em dia'}. Abrir detalhes`}

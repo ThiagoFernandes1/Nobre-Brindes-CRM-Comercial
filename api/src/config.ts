@@ -2,7 +2,7 @@ import path from 'node:path';
 import dotenv from 'dotenv';
 import { z } from 'zod';
 
-// Um único .env na raiz do repositório alimenta docker-compose e API.
+// mesmo .env da raiz que o docker-compose usa
 dotenv.config({ path: path.resolve(import.meta.dirname, '../../.env'), quiet: true });
 
 const optionalString = z

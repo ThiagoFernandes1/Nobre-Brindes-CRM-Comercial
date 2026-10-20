@@ -17,10 +17,7 @@ interface PendingMove {
 
 const LOSS_SUGGESTIONS = ['Preço acima do orçamento do cliente', 'Fechou com concorrente', 'Prazo de entrega não atende o evento', 'Cliente cancelou o evento', 'Sem resposta do cliente'];
 
-/**
- * Fluxo único de mudança de etapa, usado pelo arrastar do Kanban e pelos botões do detalhe.
- * `onOpenOpportunity` permite oferecer "completar dados" quando a API recusa por falta de informação.
- */
+// usado pelo arrastar do quadro e pelos botões do detalhe
 export function useStageMover(meta: Meta | undefined, onOpenOpportunity?: (id: number) => void) {
   const [pending, setPending] = useState<PendingMove | null>(null);
   const changeStage = useChangeStage();
@@ -39,7 +36,7 @@ export function useStageMover(meta: Meta | undefined, onOpenOpportunity?: (id: n
       setPending({ opportunity, to, kind });
       return;
     }
-    // Movimentos que sabemos inválidos vão à API sem mexer no card: a mensagem vem da regra oficial.
+    // movimento inválido não mexe no card, só mostra a mensagem que a API devolver
     run(opportunity, to, { optimistic: kind === 'ADVANCE' }).catch((error: unknown) => {
       const needsData = error instanceof ApiError && error.code === 'REQUIREMENTS_NOT_MET';
       toast({
@@ -56,7 +53,7 @@ export function useStageMover(meta: Meta | undefined, onOpenOpportunity?: (id: n
 
   const dialog = (
     <ReasonDialog
-      // nova chave a cada movimento: o formulário começa limpo
+      // key nova a cada movimento para limpar o formulário
       key={pending ? `${pending.opportunity.id}-${pending.to}` : 'none'}
       pending={pending}
       meta={meta}

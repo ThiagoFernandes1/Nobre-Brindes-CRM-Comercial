@@ -5,7 +5,6 @@ export interface Notifier {
   send(digest: SellerDigest): Promise<void>;
 }
 
-/** Padrão em desenvolvimento: escreve o resumo no log da API. */
 export class LogNotifier implements Notifier {
   readonly channel = 'log';
   constructor(private readonly log: (message: string) => void = console.log) {}
@@ -15,7 +14,7 @@ export class LogNotifier implements Notifier {
   }
 }
 
-/** Envia para um webhook (Slack, Teams, n8n...). O corpo leva o texto pronto e os dados estruturados. */
+// Slack, Teams, n8n...
 export class WebhookNotifier implements Notifier {
   readonly channel = 'webhook';
   constructor(

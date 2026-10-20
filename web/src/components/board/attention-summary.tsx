@@ -9,7 +9,6 @@ interface AttentionSummaryProps {
   onToggleAttention: () => void;
 }
 
-/** Responde de cara: "o que eu preciso trabalhar hoje?". */
 export function AttentionSummary({ opportunities, today, onlyAttention, onToggleAttention }: AttentionSummaryProps) {
   const open = opportunities.filter((o) => o.stage !== 'FECHAMENTO' && o.stage !== 'PERDIDA');
   const critical = open.filter((o) => o.attention.level === 'CRITICAL').length;

@@ -25,7 +25,7 @@ import {
   type Actor,
 } from '../services/opportunities.js';
 
-/** Nome de quem está agindo, só para auditoria. Não é autenticação (ver README > Segurança). */
+// só para o histórico, não é autenticação
 function actorOf(request: FastifyRequest): Actor {
   const raw = request.headers['x-user-name'];
   if (typeof raw !== 'string' || raw.trim() === '') return null;
@@ -99,6 +99,5 @@ export async function registerRoutes(app: FastifyInstance, deps: AppDeps) {
     return getAgenda(db, today(), sellerId);
   });
 
-  // Disparo manual do job (útil em dev e para um agendador externo em produção).
   app.post('/follow-ups/run', async () => runFollowUpJob(db, notifier, today()));
 }

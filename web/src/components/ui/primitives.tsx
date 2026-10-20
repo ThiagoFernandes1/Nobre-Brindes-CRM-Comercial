@@ -86,7 +86,6 @@ export function EmptyState({ title, message, action }: { title: string; message?
   );
 }
 
-/** Mostra a lista de requisitos faltantes que a API devolve (ex.: valor estimado, item de brinde). */
 export function ApiErrorMessage({ error }: { error: unknown }) {
   if (!error) return null;
   const e = error as { message?: string; details?: { missing?: { message: string }[]; issues?: { path: string; message: string }[] } };

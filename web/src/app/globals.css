@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* Verde institucional do Grupo Nobre */
+  /* verde do Grupo Nobre */
   --color-brand-50: #eef6f1;
   --color-brand-100: #d5eadc;
   --color-brand-200: #acd4ba;
@@ -15,7 +15,6 @@
 }
 
 :root {
-  /* Ferramenta interna, tema claro único: prioridade é contraste e leitura rápida. */
   color-scheme: light;
 }
 

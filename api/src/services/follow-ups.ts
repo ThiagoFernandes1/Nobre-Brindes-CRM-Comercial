@@ -12,7 +12,6 @@ import {
   type AgendaTask,
 } from '../repositories/follow-up-tasks.js';
 
-/** Alinha a tarefa de retorno aberta de uma oportunidade com o plano atual. Chamado dentro da transação de cada mudança. */
 export async function syncFollowUpTask(db: Queryable, opportunity: Opportunity): Promise<TaskChange> {
   const change = reconcileTask(planFollowUp(opportunity), await findOpenTask(db, opportunity.id));
   switch (change.type) {
@@ -36,15 +35,12 @@ export interface ReconcileSummary {
   unchanged: number;
 }
 
-/**
- * Varredura completa: garante que toda oportunidade aberta tem seu próximo retorno e nenhuma fechada ficou
- * com tarefa pendurada. Cobre o que os eventos da API não cobrem (carga inicial, edição direta no banco, falhas).
- */
+// varre tudo: cobre a carga inicial e o que os eventos da API não pegaram
 export async function reconcileAllFollowUps(db: Db): Promise<ReconcileSummary> {
   const summary: ReconcileSummary = { created: 0, updated: 0, canceled: 0, unchanged: 0 };
   const { rows } = await db.query<{ id: number }>('SELECT id FROM opportunities ORDER BY id');
   for (const { id } of rows) {
-    // Relê com lock: o plano tem que ser calculado sobre o estado atual, não sobre uma leitura antiga.
+    // relê com lock para não planejar em cima de dado velho
     const change = await withTransaction(db, async (client) => {
       const opportunity = await findOpportunityById(client, id, { forUpdate: true });
       return opportunity ? syncFollowUpTask(client, opportunity) : ({ type: 'KEEP' } as const);
@@ -64,7 +60,6 @@ export interface AgendaEntry extends AgendaTask {
   daysLate: number;
 }
 
-/** Quantos dias à frente a agenda mostra em "Próximos". */
 export const AGENDA_LOOKAHEAD_DAYS = 7;
 
 export async function getAgenda(db: Queryable, today: IsoDate, sellerId?: number): Promise<AgendaEntry[]> {

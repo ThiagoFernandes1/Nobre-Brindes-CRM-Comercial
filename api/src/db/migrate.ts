@@ -5,7 +5,6 @@ import { createPool, withTransaction, type Db } from './pool.js';
 
 const MIGRATIONS_DIR = path.join(import.meta.dirname, 'migrations');
 
-/** Aplica, em ordem e cada uma em sua transação, as migrações .sql ainda não aplicadas. */
 export async function migrate(db: Db, { reset = false } = {}): Promise<string[]> {
   if (reset) {
     await db.query('DROP SCHEMA public CASCADE; CREATE SCHEMA public;');

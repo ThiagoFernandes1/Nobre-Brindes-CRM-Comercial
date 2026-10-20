@@ -1,4 +1,3 @@
-/** Erro de negócio com status HTTP e um código estável que o front pode tratar. */
 export class AppError extends Error {
   constructor(
     readonly statusCode: number,

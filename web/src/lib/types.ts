@@ -1,4 +1,4 @@
-// Espelho dos contratos da API (api/src). Mantidos à mão por simplicidade; ver README > Limitações.
+// mesmos tipos da API, mantidos à mão
 
 export type Stage =
   | 'PRIMEIRO_CONTATO'

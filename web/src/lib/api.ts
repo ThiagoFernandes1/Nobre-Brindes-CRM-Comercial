@@ -22,7 +22,7 @@ export class ApiError extends Error {
 
 let actorName: string | null = null;
 
-/** Nome de quem está usando a tela, enviado só para registro no histórico (não é autenticação). */
+// vai no header x-user-name, só para o histórico
 export function setActorName(name: string | null) {
   actorName = name;
 }

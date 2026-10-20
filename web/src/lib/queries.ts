@@ -25,7 +25,7 @@ export function useOpportunities(filters: OpportunityFilters) {
   return useQuery({
     queryKey: queryKeys.opportunities(filters),
     queryFn: () => api.listOpportunities(filters),
-    // Ao digitar na busca, mantém o quadro anterior na tela em vez de piscar o carregamento.
+    // mantém os dados anteriores enquanto busca
     placeholderData: keepPreviousData,
   });
 }
@@ -42,7 +42,6 @@ export function useAgenda(sellerId: number | null) {
   return useQuery({ queryKey: queryKeys.agenda(sellerId), queryFn: () => api.agenda(sellerId) });
 }
 
-/** Tudo que depende de uma oportunidade: quadro, detalhe e agenda de retornos. */
 function useInvalidateOpportunity() {
   const queryClient = useQueryClient();
   return (id: number) =>
@@ -58,11 +57,10 @@ export interface ChangeStageVariables {
   from: Stage;
   to: Stage;
   reason?: string;
-  /** Mover o card antes da resposta. Desligado quando já sabemos que a API deve recusar. */
+  /** false quando já se sabe que a API vai recusar */
   optimistic?: boolean;
 }
 
-/** Move o card na hora (otimista) e desfaz se a API recusar. */
 export function useChangeStage() {
   const queryClient = useQueryClient();
   const invalidate = useInvalidateOpportunity();

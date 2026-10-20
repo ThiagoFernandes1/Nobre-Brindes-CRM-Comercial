@@ -1,8 +1,8 @@
 import pg from 'pg';
 
-// DATE (oid 1082) vira string 'YYYY-MM-DD': evita o deslocamento de fuso que o driver faz ao criar um Date.
+// DATE como string, sem conversão de fuso
 pg.types.setTypeParser(1082, (value) => value);
-// NUMERIC (oid 1700) vira number: os valores do CRM cabem com folga na precisão de um double.
+// NUMERIC como number
 pg.types.setTypeParser(1700, (value) => Number(value));
 
 export type Db = pg.Pool;

@@ -25,7 +25,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     (toast: Omit<Toast, 'id'>) => {
       const id = nextId++;
       setToasts((list) => [...list.slice(-2), { ...toast, id }]);
-      // Erros ficam mais tempo: o vendedor precisa ler o motivo da recusa.
+      // erro fica mais tempo na tela
       setTimeout(() => dismiss(id), toast.tone === 'error' ? 8000 : 3500);
     },
     [dismiss],

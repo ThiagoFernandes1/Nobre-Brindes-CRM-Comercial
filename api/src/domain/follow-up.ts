@@ -1,7 +1,7 @@
 import { addDays, formatBr, type IsoDate } from '../lib/dates.js';
 import { isFinal, type OpenStage, type Stage } from './stages.js';
 
-/** Dias sem contato tolerados em cada etapa antes do próximo retorno. */
+// dias até o próximo retorno, contando do último contato
 export const FOLLOW_UP_CADENCE_DAYS: Record<OpenStage, number> = {
   PRIMEIRO_CONTATO: 1,
   APRESENTACAO_ORCAMENTO: 2,
@@ -9,7 +9,7 @@ export const FOLLOW_UP_CADENCE_DAYS: Record<OpenStage, number> = {
   FORECAST: 2,
 };
 
-/** Antecedência mínima antes do evento do cliente para produzir brinde personalizado. */
+// prazo mínimo de produção antes do evento
 export const PRODUCTION_LEAD_DAYS = 7;
 
 export type FollowUpReason =
@@ -23,7 +23,7 @@ export interface FollowUpSubject {
   stage: Stage;
   leadReceivedOn: IsoDate;
   lastContactAt: IsoDate | null;
-  /** Data de retorno combinada com o cliente no último contato. */
+  /** retorno combinado com o cliente */
   requestedFollowUpAt: IsoDate | null;
   proposalValidUntil: IsoDate | null;
   eventDate: IsoDate | null;
@@ -44,14 +44,8 @@ const CADENCE_TITLES: Record<OpenStage, string> = {
 
 const STAGES_WITH_PROPOSAL: readonly Stage[] = ['APRESENTACAO_ORCAMENTO', 'FOLLOW_UP', 'FORECAST'];
 
-/**
- * Calcula o próximo retorno que o vendedor deve fazer. Função pura e determinística:
- * depende só dos dados da oportunidade, não de "hoje" — quem decide se está atrasado é quem consulta.
- *
- * Começa pela cadência da etapa (ou pela data combinada com o cliente) e antecipa o retorno quando
- * a proposta vai vencer ou quando o prazo de produção do evento está chegando. Um prazo que cai
- * antes do último contato é ignorado: o vendedor já falou com o cliente depois dele.
- */
+// Pega o prazo mais cedo entre a cadência (ou a data combinada), a véspera do vencimento da proposta
+// e o prazo de produção do evento. Prazo anterior ao último contato é ignorado porque já foi tratado.
 export function planFollowUp(subject: FollowUpSubject): PlannedFollowUp | null {
   if (isFinal(subject.stage)) return null;
   const stage = subject.stage;
@@ -103,7 +97,6 @@ export function planFollowUp(subject: FollowUpSubject): PlannedFollowUp | null {
     }
   }
 
-  // Vence o prazo mais cedo; em empate, a ordem acima (mais específica primeiro) desempata.
   return candidates.reduce((earliest, candidate) => (candidate.dueDate < earliest.dueDate ? candidate : earliest));
 }
 
@@ -120,10 +113,7 @@ export type TaskChange =
   | { type: 'UPDATE'; taskId: number; plan: PlannedFollowUp }
   | { type: 'CANCEL'; taskId: number };
 
-/**
- * Compara o retorno planejado com a tarefa aberta e diz o que fazer. Idempotente: rodar de novo
- * sobre o mesmo estado sempre devolve KEEP, então o job pode executar quantas vezes quiser.
- */
+// idempotente: o mesmo estado sempre dá KEEP
 export function reconcileTask(plan: PlannedFollowUp | null, openTask: OpenTask | null): TaskChange {
   if (!plan) return openTask ? { type: 'CANCEL', taskId: openTask.id } : { type: 'KEEP' };
   if (!openTask) return { type: 'CREATE', plan };

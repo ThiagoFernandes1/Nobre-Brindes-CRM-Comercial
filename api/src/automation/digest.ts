@@ -18,7 +18,7 @@ export interface SellerDigest {
   dueToday: DigestLine[];
 }
 
-/** Agrupa por vendedor o que vence hoje ou já venceu. Vendedor sem pendência não recebe resumo. */
+// só entra quem tem retorno atrasado ou para hoje
 export function buildSellerDigests(agenda: AgendaEntry[], today: IsoDate): SellerDigest[] {
   const bySeller = new Map<number, SellerDigest>();
   for (const entry of agenda) {

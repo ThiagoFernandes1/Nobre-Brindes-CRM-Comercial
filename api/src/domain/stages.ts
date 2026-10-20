@@ -18,7 +18,7 @@ export const STAGE_LABELS: Record<Stage, string> = {
   PERDIDA: 'Perdida',
 };
 
-/** Etapas do funil, na ordem. "Perdida" fica fora: é uma saída lateral, não um degrau. */
+// Perdida fica fora da sequência
 export const PIPELINE = [
   'PRIMEIRO_CONTATO',
   'APRESENTACAO_ORCAMENTO',
@@ -39,14 +39,7 @@ export function pipelineIndex(stage: Stage): number {
   return (PIPELINE as readonly Stage[]).indexOf(stage);
 }
 
-/**
- * Retornos de etapa permitidos (origem -> destinos). Decisão documentada no README:
- * - Follow-up -> Apresentação de Orçamento: cliente pediu revisão (quantidade, item, preço).
- * - Forecast -> Follow-up: cliente esfriou/adiou a decisão; volta a ser cobrado.
- * - Forecast -> Apresentação de Orçamento: renegociação que exige nova proposta.
- * Nunca se volta para Primeiro Contato (o contato já aconteceu; voltar distorceria o SLA)
- * e estados finais não reabrem (uma nova negociação vira uma nova oportunidade).
- */
+// retornos permitidos (justificativa no README)
 export const ALLOWED_RETURNS: Partial<Record<Stage, readonly Stage[]>> = {
   FOLLOW_UP: ['APRESENTACAO_ORCAMENTO'],
   FORECAST: ['FOLLOW_UP', 'APRESENTACAO_ORCAMENTO'],

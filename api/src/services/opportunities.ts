@@ -29,7 +29,7 @@ import {
 } from '../repositories/opportunities.js';
 import { syncFollowUpTask } from './follow-ups.js';
 
-/** Quem fez a ação. Sem autenticação nesta versão: vem de um header informativo (ver README > Segurança). */
+// sem autenticação por enquanto: vem do header x-user-name
 export type Actor = string | null;
 
 export interface OpportunityView extends Opportunity {
@@ -45,7 +45,6 @@ function toView(opportunity: Opportunity, today: IsoDate): OpportunityView {
   return { ...opportunity, attention: assessAttention(opportunity, today) };
 }
 
-/** Mais urgente primeiro; em empate, o retorno que vence antes; por fim, maior valor. */
 function byUrgency(a: OpportunityView, b: OpportunityView): number {
   return (
     b.attention.score - a.attention.score ||
@@ -143,7 +142,7 @@ export async function updateOpportunity(
       notes: input.notes !== undefined ? input.notes : current.notes,
     };
 
-    // A etapa atual continua exigindo o que exigiu para entrar nela (ex.: não dá para apagar o valor em Follow-up).
+    // a etapa atual continua exigindo o que exigiu para entrar
     const violations = stageInvariantViolations(
       { ...fields, itemCount: input.items?.length ?? current.items.length },
       current.stage,
@@ -169,7 +168,7 @@ export async function updateOpportunity(
 
 export interface ChangeStageInput {
   toStage: Stage;
-  /** Etapa que o usuário via na tela. Se mudou nesse meio-tempo, a operação é recusada em vez de sobrescrever. */
+  // se a etapa mudou desde que a tela carregou, recusa com 409
   expectedFromStage?: Stage;
   reason?: string | null;
 }
@@ -222,10 +221,6 @@ export interface RegisterContactInput {
   nextFollowUpAt?: IsoDate | null;
 }
 
-/**
- * Registrar um contato é o que "cumpre" o retorno: fecha a tarefa aberta e a automação agenda a próxima
- * (na data combinada com o cliente, se houver, ou pela cadência da etapa).
- */
 export async function registerContact(
   db: Db,
   id: number,
