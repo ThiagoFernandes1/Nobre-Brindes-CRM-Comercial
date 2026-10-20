@@ -1,0 +1,16 @@
+{
+  "name": "nobre-crm",
+  "private": true,
+  "description": "CRM comercial da Nobre Brindes (case técnico Grupo Nobre)",
+  "scripts": {
+    "setup": "npm --prefix api ci && npm --prefix web ci",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "db:reset": "npm --prefix api run db:reset",
+    "dev:api": "npm --prefix api run dev",
+    "dev:web": "npm --prefix web run dev",
+    "job:follow-ups": "npm --prefix api run job:follow-ups",
+    "test": "npm --prefix api test",
+    "lint": "npm --prefix api run typecheck && npm --prefix web run lint"
+  }
+}
