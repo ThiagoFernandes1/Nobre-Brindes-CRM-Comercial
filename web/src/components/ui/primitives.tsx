@@ -114,3 +114,11 @@ export function ApiErrorMessage({ error }: { error: unknown }) {
     </div>
   );
 }
+
+export function Kbd({ children }: { children: ReactNode }) {
+  return (
+    <kbd className="inline-flex h-5 min-w-5 items-center justify-center rounded border border-stone-300 bg-stone-50 px-1 font-sans text-[11px] font-medium text-stone-600 shadow-[0_1px_0_var(--color-stone-300)]">
+      {children}
+    </kbd>
+  );
+}

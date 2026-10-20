@@ -30,6 +30,13 @@ export function useOpportunities(filters: OpportunityFilters) {
   });
 }
 
+const NO_FILTERS: OpportunityFilters = { search: '', sellerId: null, needsAttention: false };
+
+// lista completa: o funil e a busca global filtram no navegador, o que deixa a busca instantânea
+export function useAllOpportunities() {
+  return useOpportunities(NO_FILTERS);
+}
+
 export function useOpportunityDetail(id: number | null) {
   return useQuery({
     queryKey: queryKeys.opportunity(id ?? 0),

@@ -4,9 +4,11 @@ Primeira versão de um CRM para o time comercial da Nobre Brindes. Dá para acom
 
 ![Funil](docs/funil.png)
 
-| Detalhe da oportunidade | Agenda de retornos |
+| Busca global (Ctrl+K) | Detalhe da oportunidade |
 | --- | --- |
-| ![Detalhe](docs/detalhe.png) | ![Retornos](docs/retornos.png) |
+| ![Busca](docs/busca.png) | ![Detalhe](docs/detalhe.png) |
+
+![Retornos](docs/retornos.png)
 
 ## Como rodar
 
@@ -118,14 +120,21 @@ A ideia é o vendedor abrir a tela e saber em segundos onde mexer. Cada oportuni
 | evento do cliente | em até 14 dias | em até 7 dias (prazo de produção) ou já passou |
 | proposta sem validade em Follow-up/Forecast | sim | |
 
-Na tela, isso aparece em quatro lugares:
+### Interface
 
-- No topo, um resumo: quantas negociações pedem atenção, quantos retornos estão atrasados, quantos são para hoje e o valor em negociação. O botão "Ver só essas" filtra o quadro.
-- Nos cards: borda vermelha ou amarela e o motivo escrito ("Retorno atrasado há 7 dias"). Dentro de cada coluna, os mais urgentes vêm primeiro.
-- Busca por empresa, código ou brinde, e filtro por vendedor.
-- Telas de carregando, erro (com "Tentar novamente") e "nada encontrado". Se a API recusar um movimento, o card volta para o lugar e aparece o motivo.
+O foco foi achar rápido o que precisa ser trabalhado.
 
-Dá para arrastar com mouse ou no celular. Pelo teclado, Enter abre o detalhe, que tem os botões de avançar, voltar e marcar como perdida.
+- **Resumo no topo:** mostra quantas negociações pedem atenção, quantos retornos estão atrasados, quantos são para hoje e o valor em negociação. Cada cartão é também um filtro: clicou, o quadro mostra só aquilo.
+- **Filtros rápidos com contagem:** Minhas, Críticas, Proposta vencendo e Evento próximo. Dá para combinar com a busca e com o vendedor.
+- **Busca no funil (`/`):** procura em empresa, código, brinde, vendedor e anotações, sem ligar para acento ("clinica" acha "Clínica"), e destaca o trecho encontrado. Como o funil inteiro já vem carregado, o filtro roda no navegador e responde na hora.
+- **Busca global (`Ctrl+K`):** funciona em qualquer tela. Acha uma oportunidade e abre o detalhe, ou executa ações como "Nova oportunidade" e "Mostrar retornos atrasados". Sem nada digitado, sugere o que pede atenção agora.
+- **Kanban ou Lista:** a lista é uma tabela ordenável por urgência, valor, próximo retorno, evento etc. A escolha fica salva no navegador.
+- **Colunas recolhíveis:** Fechamento e Perdida começam recolhidas para sobrar espaço para o que está em negociação. Mesmo recolhidas, aceitam o card arrastado.
+- **Cards:** borda vermelha ou amarela, o motivo escrito ("Retorno atrasado há 7 dias") e o próximo retorno. Dentro da coluna, os mais urgentes vêm primeiro.
+- **Retornos:** agenda com busca, filtro por vendedor e "Registrar contato" direto na linha. O menu mostra quantos retornos estão pendentes hoje.
+- **Estados da tela:** carregando, erro (com "Tentar novamente") e "nada encontrado" (com "Limpar filtros"). Se a API recusar um movimento, o card volta para o lugar e aparece o motivo.
+
+Atalhos: `Ctrl+K` busca global, `/` busca no funil, `N` nova oportunidade e `?` lista os atalhos. Dá para arrastar com mouse ou no celular. Pelo teclado, Enter abre o detalhe, que tem os botões de avançar, voltar e marcar como perdida.
 
 Com os dados do case aparecem três críticas: Construtora Horizonte (sem retorno há 7 dias, proposta vencida, evento em 10 dias), Agência Pulso (atrasada há 10 dias, proposta vencida) e Clínica Vida (evento em 3 dias).
 
@@ -220,7 +229,7 @@ Como tratei os campos em branco e o que faltava na planilha:
 - Não tem login (não era pedido).
 - Contato e entrada do lead são por dia, não por hora, porque a planilha é assim. Um SLA em minutos precisaria de hora.
 - Os tipos estão repetidos entre a API e o front. Daria para gerar um contrato OpenAPI e o cliente a partir dele.
-- Não tem paginação. Com esse volume não faz falta; com milhares de oportunidades, seria por coluna.
+- Não tem paginação: o funil vem inteiro e os filtros da tela rodam no navegador. Com esse volume é o mais rápido. Com milhares de oportunidades, eu usaria os filtros que a API já aceita (`search`, `sellerId`, `needsAttention`) e paginaria por coluna.
 - O job roda dentro da API, o que é ok localmente mas não é o ideal em produção.
 - Não tem teste de ponta a ponta no navegador versionado. Testei os fluxos no navegador durante o desenvolvimento, e o próximo passo seria Playwright no CI.
 - Os prazos (cadência, 3/7/14 dias) são constantes no código. Com uso real, eu ajustaria junto com o time comercial.

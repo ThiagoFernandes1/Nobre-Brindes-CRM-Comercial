@@ -6,13 +6,22 @@ import { useMeta, useOpportunityDetail, useUpdateOpportunity } from '@/lib/queri
 import { availableMoves, stageLabel } from '@/lib/stage-moves';
 import type { Meta, OpportunityDetail, StageHistoryEntry } from '@/lib/types';
 import { useStageMover } from '../board/use-stage-mover';
+import type { DrawerMode } from '../ui-provider';
 import { Modal } from '../ui/modal';
 import { Button, ErrorState, SeverityBadge, Spinner } from '../ui/primitives';
 import { useToast } from '../ui/toast';
 import { CHANNEL_LABELS, ContactForm } from './contact-form';
 import { OpportunityForm } from './opportunity-form';
 
-export function OpportunityDrawer({ opportunityId, onClose }: { opportunityId: number | null; onClose: () => void }) {
+export function OpportunityDrawer({
+  opportunityId,
+  initialMode = 'view',
+  onClose,
+}: {
+  opportunityId: number | null;
+  initialMode?: DrawerMode;
+  onClose: () => void;
+}) {
   const detail = useOpportunityDetail(opportunityId);
   const meta = useMeta();
 
@@ -44,14 +53,14 @@ export function OpportunityDrawer({ opportunityId, onClose }: { opportunityId: n
         />
       ) : (
         // key: trocar de oportunidade reseta os formulários
-        <DrawerBody key={detail.data.id} opportunity={detail.data} meta={meta.data} />
+        <DrawerBody key={detail.data.id} opportunity={detail.data} meta={meta.data} initialMode={initialMode} />
       )}
     </Modal>
   );
 }
 
-function DrawerBody({ opportunity, meta }: { opportunity: OpportunityDetail; meta: Meta }) {
-  const [mode, setMode] = useState<'view' | 'contact' | 'edit'>('view');
+function DrawerBody({ opportunity, meta, initialMode }: { opportunity: OpportunityDetail; meta: Meta; initialMode: DrawerMode }) {
+  const [mode, setMode] = useState<DrawerMode>(initialMode);
   const { requestMove, dialog } = useStageMover(meta);
   const update = useUpdateOpportunity(opportunity.id);
   const toast = useToast();

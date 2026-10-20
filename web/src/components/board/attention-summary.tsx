@@ -1,82 +1,111 @@
-import Link from 'next/link';
+'use client';
+
+import { CalendarClock, Clock, TriangleAlert, Wallet, type LucideIcon } from 'lucide-react';
+import { QUICK_FILTERS, toggleQuickFilter, type QuickFilterId } from '@/lib/board-filters';
 import { formatCurrency, pluralize } from '@/lib/format';
 import type { Opportunity } from '@/lib/types';
 
 interface AttentionSummaryProps {
   opportunities: Opportunity[];
   today: string;
-  onlyAttention: boolean;
-  onToggleAttention: () => void;
+  currentSellerId: number | null;
+  activeQuick: QuickFilterId[];
 }
 
-export function AttentionSummary({ opportunities, today, onlyAttention, onToggleAttention }: AttentionSummaryProps) {
+export function AttentionSummary({ opportunities, today, currentSellerId, activeQuick }: AttentionSummaryProps) {
+  const ctx = { today, currentSellerId };
+  const count = (id: QuickFilterId) => opportunities.filter((o) => QUICK_FILTERS[id].test(o, ctx)).length;
   const open = opportunities.filter((o) => o.stage !== 'FECHAMENTO' && o.stage !== 'PERDIDA');
   const critical = open.filter((o) => o.attention.level === 'CRITICAL').length;
-  const warning = open.filter((o) => o.attention.level === 'WARNING').length;
-  const overdue = open.filter((o) => (o.attention.nextFollowUp?.daysLate ?? 0) > 0).length;
-  const dueToday = open.filter((o) => o.attention.nextFollowUp?.dueDate === today).length;
+  const attention = count('attention');
   const pipeline = open.reduce((sum, o) => sum + (o.estimatedValue ?? 0), 0);
 
   return (
     <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
-      <div
-        className={`col-span-2 flex items-center justify-between gap-3 rounded-xl border p-3 lg:col-span-1 ${
-          critical > 0 ? 'border-red-200 bg-red-50' : warning > 0 ? 'border-amber-200 bg-amber-50' : 'border-brand-100 bg-brand-50'
-        }`}
-      >
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-stone-600">Exigem atenção</p>
-          <p className="text-2xl font-semibold text-stone-900">{critical + warning}</p>
-          <p className="text-xs text-stone-600">
-            {critical + warning === 0 ? 'Tudo em dia' : `${critical} críticas · ${warning} alertas`}
-          </p>
-        </div>
-        {(critical + warning > 0 || onlyAttention) && (
-          <button
-            type="button"
-            onClick={onToggleAttention}
-            aria-pressed={onlyAttention}
-            className="rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-stone-800 shadow-sm ring-1 ring-stone-200 hover:bg-stone-50"
-          >
-            {onlyAttention ? 'Ver todas' : 'Ver só essas'}
-          </button>
-        )}
-      </div>
-
-      <Stat label="Retornos atrasados" value={overdue} tone={overdue > 0 ? 'text-red-700' : undefined} />
-      <Link href="/retornos" className="rounded-xl border border-stone-200 bg-white p-3 hover:border-brand-600">
-        <p className="text-xs font-medium uppercase tracking-wide text-stone-600">Retornos para hoje</p>
-        <p className="text-2xl font-semibold text-stone-900">{dueToday}</p>
-        <p className="text-xs text-brand-700">Abrir minha agenda →</p>
-      </Link>
-      <Stat
-        className="col-span-2 lg:col-span-1"
-        label="Em negociação"
-        value={formatCurrency(pipeline)}
-        note={pluralize(open.length, 'oportunidade aberta', 'oportunidades abertas')}
+      <FilterTile
+        id="attention"
+        icon={TriangleAlert}
+        label="Exigem atenção"
+        value={attention}
+        note={attention === 0 ? 'Tudo em dia' : `${critical} críticas · ${attention - critical} alertas`}
+        tone={critical > 0 ? 'red' : attention > 0 ? 'amber' : 'green'}
+        active={activeQuick.includes('attention')}
       />
+      <FilterTile
+        id="overdue"
+        icon={Clock}
+        label="Retornos atrasados"
+        value={count('overdue')}
+        note="sem contato no prazo"
+        tone={count('overdue') > 0 ? 'red' : 'neutral'}
+        active={activeQuick.includes('overdue')}
+      />
+      <FilterTile
+        id="today"
+        icon={CalendarClock}
+        label="Retornos para hoje"
+        value={count('today')}
+        note="agenda do dia"
+        tone="neutral"
+        active={activeQuick.includes('today')}
+      />
+      <div className="rounded-xl border border-stone-200 bg-white p-3">
+        <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-stone-500">
+          <Wallet className="size-3.5" aria-hidden />
+          Em negociação
+        </p>
+        <p className="mt-1 text-2xl font-semibold tabular-nums text-stone-900">{formatCurrency(pipeline)}</p>
+        <p className="text-xs text-stone-500">{pluralize(open.length, 'oportunidade aberta', 'oportunidades abertas')}</p>
+      </div>
     </div>
   );
 }
 
-function Stat({
+const TONES = {
+  red: { idle: 'border-red-200 bg-red-50', value: 'text-red-700' },
+  amber: { idle: 'border-amber-200 bg-amber-50', value: 'text-amber-800' },
+  green: { idle: 'border-brand-100 bg-brand-50', value: 'text-brand-800' },
+  neutral: { idle: 'border-stone-200 bg-white', value: 'text-stone-900' },
+};
+
+function FilterTile({
+  id,
+  icon: Icon,
   label,
   value,
   note,
   tone,
-  className = '',
+  active,
 }: {
+  id: QuickFilterId;
+  icon: LucideIcon;
   label: string;
-  value: string | number;
-  note?: string;
-  tone?: string;
-  className?: string;
+  value: number;
+  note: string;
+  tone: keyof typeof TONES;
+  active: boolean;
 }) {
   return (
-    <div className={`rounded-xl border border-stone-200 bg-white p-3 ${className}`}>
-      <p className="text-xs font-medium uppercase tracking-wide text-stone-600">{label}</p>
-      <p className={`text-2xl font-semibold ${tone ?? 'text-stone-900'}`}>{value}</p>
-      {note && <p className="text-xs text-stone-500">{note}</p>}
-    </div>
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={() => toggleQuickFilter(id)}
+      title={active ? 'Clique para remover o filtro' : 'Clique para filtrar o quadro'}
+      className={`group rounded-xl border p-3 text-left transition hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 ${
+        active ? 'border-brand-700 bg-white ring-2 ring-brand-700' : `${TONES[tone].idle} hover:border-stone-400`
+      }`}
+    >
+      <p className="flex items-center justify-between gap-1.5 text-xs font-medium uppercase tracking-wide text-stone-500">
+        <span className="flex items-center gap-1.5">
+          <Icon className="size-3.5" aria-hidden />
+          {label}
+        </span>
+        <span className={`normal-case tracking-normal ${active ? 'text-brand-700' : 'text-stone-400 group-hover:text-stone-600'}`}>
+          {active ? 'filtrando ✓' : 'filtrar'}
+        </span>
+      </p>
+      <p className={`mt-1 text-2xl font-semibold tabular-nums ${TONES[tone].value}`}>{value}</p>
+      <p className="text-xs text-stone-500">{note}</p>
+    </button>
   );
 }
