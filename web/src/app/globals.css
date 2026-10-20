@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  /* Verde institucional do Grupo Nobre */
+  --color-brand-50: #eef6f1;
+  --color-brand-100: #d5eadc;
+  --color-brand-200: #acd4ba;
+  --color-brand-600: #2f6f4e;
+  --color-brand-700: #255c40;
+  --color-brand-800: #1d4a33;
+  --color-brand-900: #163a28;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+:root {
+  /* Ferramenta interna, tema claro único: prioridade é contraste e leitura rápida. */
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-stone-50);
+  color: var(--color-stone-900);
+  font-family: var(--font-sans);
+}
