@@ -106,3 +106,28 @@ export function planFollowUp(subject: FollowUpSubject): PlannedFollowUp | null {
   // Vence o prazo mais cedo; em empate, a ordem acima (mais específica primeiro) desempata.
   return candidates.reduce((earliest, candidate) => (candidate.dueDate < earliest.dueDate ? candidate : earliest));
 }
+
+export interface OpenTask {
+  id: number;
+  dueDate: IsoDate;
+  reason: string;
+  title: string;
+}
+
+export type TaskChange =
+  | { type: 'KEEP' }
+  | { type: 'CREATE'; plan: PlannedFollowUp }
+  | { type: 'UPDATE'; taskId: number; plan: PlannedFollowUp }
+  | { type: 'CANCEL'; taskId: number };
+
+/**
+ * Compara o retorno planejado com a tarefa aberta e diz o que fazer. Idempotente: rodar de novo
+ * sobre o mesmo estado sempre devolve KEEP, então o job pode executar quantas vezes quiser.
+ */
+export function reconcileTask(plan: PlannedFollowUp | null, openTask: OpenTask | null): TaskChange {
+  if (!plan) return openTask ? { type: 'CANCEL', taskId: openTask.id } : { type: 'KEEP' };
+  if (!openTask) return { type: 'CREATE', plan };
+  const unchanged =
+    openTask.dueDate === plan.dueDate && openTask.reason === plan.reason && openTask.title === plan.title;
+  return unchanged ? { type: 'KEEP' } : { type: 'UPDATE', taskId: openTask.id, plan };
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { planFollowUp, type FollowUpSubject } from '../../src/domain/follow-up.js';
+import { planFollowUp, reconcileTask, type FollowUpSubject } from '../../src/domain/follow-up.js';
 
 function subject(overrides: Partial<FollowUpSubject> = {}): FollowUpSubject {
   return {
@@ -68,5 +68,28 @@ describe('planFollowUp', () => {
     expect(planFollowUp(subject({ stage: 'PRIMEIRO_CONTATO', proposalValidUntil: '2026-10-14' }))).toMatchObject({
       reason: 'CADENCE',
     });
+  });
+});
+
+describe('reconcileTask', () => {
+  const plan = { dueDate: '2026-10-16', reason: 'CADENCE' as const, title: 'Cobrar retorno sobre a proposta' };
+  const task = { id: 7, ...plan };
+
+  it('cria a tarefa quando há retorno planejado e nenhuma aberta', () => {
+    expect(reconcileTask(plan, null)).toEqual({ type: 'CREATE', plan });
+  });
+
+  it('mantém quando nada mudou (idempotente)', () => {
+    expect(reconcileTask(plan, task)).toEqual({ type: 'KEEP' });
+  });
+
+  it('atualiza quando o prazo ou o motivo mudam', () => {
+    const earlier = { ...plan, dueDate: '2026-10-14', reason: 'PROPOSAL_EXPIRING' as const };
+    expect(reconcileTask(earlier, task)).toEqual({ type: 'UPDATE', taskId: 7, plan: earlier });
+  });
+
+  it('cancela a tarefa aberta quando a oportunidade chega a um estado final', () => {
+    expect(reconcileTask(null, task)).toEqual({ type: 'CANCEL', taskId: 7 });
+    expect(reconcileTask(null, null)).toEqual({ type: 'KEEP' });
   });
 });
